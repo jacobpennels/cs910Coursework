@@ -17,6 +17,7 @@ class DataCleaner:
         d['date_of_birth'] = pd.to_datetime(d['date_of_birth'], format='%Y-%m-%d')
         d['datetime'] = pd.to_datetime(d['datetime'], format='%Y-%m-%d')
         d['days_at_outcome'] = (d['datetime'] - d['date_of_birth']).dt.days
+        d.loc[d['days_at_outcome'] < 0, 'days_at_outcome'] = 0
         return d
 
     def fill_missing_values(self, d, column, new_val):
@@ -27,6 +28,8 @@ class DataCleaner:
         d = self.correct_ages(d)
         d = self.fill_missing_values(d, 'name', 'no-name')
         d = self.fill_missing_values(d, 'outcome_subtype', 'none')
+        d = self.fill_missing_values(d, 'outcome_type', 'Unknown outcome')
+        d = self.fill_missing_values(d, 'sex_upon_outcome', 'Unknown')
         d = d.drop('animal_id', axis=1)
         d = d.replace(regex=r'\*+', value="")
         return d
