@@ -3,6 +3,8 @@ from collections import Counter
 import matplotlib.pyplot as plt
 import numpy as np
 
+from sklearn.preprocessing import LabelEncoder
+
 class DataCleaner:
     def draw_histogram(self, d):
         labels, values = zip(*Counter(d).items())
@@ -24,6 +26,9 @@ class DataCleaner:
         d[column] = d[column].fillna(new_val)
         return d
 
+    def timestamp_to_int(self, d, col):
+        return 0
+
     def clean_data(self, d):
         d = self.correct_ages(d)
         d = self.fill_missing_values(d, 'name', 'no-name')
@@ -33,6 +38,16 @@ class DataCleaner:
         d = d.drop('animal_id', axis=1)
         d = d.replace(regex=r'\*+', value="")
         return d
+
+    def label_encode(self, d, cols):
+        encodings = {}
+        for c in cols:
+            le = LabelEncoder()
+            le.fit(d[c])
+            d[c] = le.transform(d[c])
+            encodings[c] = le
+
+        return d, encodings
 
 if __name__ == '__main__':
     data = pd.read_csv('../datafiles/aac_shelter_outcomes.csv')
